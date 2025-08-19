@@ -8,6 +8,6 @@ namespace exercise.webapi.Repository
         public Task<Book?> GetBook(int id);
         public Task<Book?> CreateBook(Book book);
         public Task<Book?> DeleteBook(int id);
-        public Task<Book?> UpdateBook(Book book);
+        public Task<Book?> UpdateBook(int id, Book book);
     }
 }

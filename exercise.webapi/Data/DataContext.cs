@@ -1,5 +1,7 @@
 ﻿using exercise.webapi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 

@@ -44,7 +44,7 @@ namespace exercise.webapi.Repository
 
         public async Task<Book?> GetBook(int id)
         {
-            return await _db.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
+            return await _db.Books.Where(b => b.Id == id).Include(b => b.Author).FirstOrDefaultAsync();
         }
 
         public async Task<Book?> UpdateBook(int id, Book book)

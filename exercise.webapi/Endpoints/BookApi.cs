@@ -37,11 +37,12 @@ namespace exercise.webapi.Endpoints
             }
 
             var dto = BookFactory.BookDtoFromBook(book);
-            return TypedResults.Ok(book);
+            return TypedResults.Ok(dto);
         }
 
         private static async Task<IResult> CreateBook(IBookRepository bookRepository, BookPostDto dto)
         {
+            // TODO
             // todo check if author exists
             // if not - notfound404
 
@@ -53,14 +54,18 @@ namespace exercise.webapi.Endpoints
 
         private static async Task<IResult> UpdateBook(IBookRepository bookRepository, int id, BookPutDto dto)
         {
-            var book = bookRepository.GetBook(id);
+            var book = await bookRepository.GetBook(id);
             if (book is null)
             {
                 return TypedResults.NotFound();
             }
 
+            // TODO
             // check if author is valid
             // else not found
+
+            var outDto = BookFactory.BookDtoFromBook(book);
+            return TypedResults.Ok(outDto);
         }
 
         private static async Task<IResult> DeleteBook(IBookRepository bookRepository, int id)

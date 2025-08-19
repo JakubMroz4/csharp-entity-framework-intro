@@ -1,5 +1,6 @@
 ﻿using exercise.webapi.Data;
 using exercise.webapi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace exercise.webapi.Repository
 {
@@ -12,14 +13,14 @@ namespace exercise.webapi.Repository
             _db = db;
         }
 
-        public Task<IEnumerable<Author>> GetAllAuthors()
+        public async Task<IEnumerable<Author>> GetAllAuthors()
         {
-            throw new NotImplementedException();
+            return await _db.Authors.Include(a => a.Books).ToListAsync();
         }
 
-        public Task<Author?> GetAuthor(int id)
+        public async Task<Author?> GetAuthor(int id)
         {
-            throw new NotImplementedException();
+            return await _db.Authors.Where(a => a.Id == id).Include(a => a.Books).FirstOrDefaultAsync();
         }
     }
 }

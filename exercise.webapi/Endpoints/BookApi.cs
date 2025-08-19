@@ -2,6 +2,9 @@
 using exercise.webapi.Factories;
 using exercise.webapi.Models;
 using exercise.webapi.Repository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text.Json;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace exercise.webapi.Endpoints
@@ -14,8 +17,8 @@ namespace exercise.webapi.Endpoints
 
             books.MapGet("/", GetBooks);
             books.MapGet("/{id}", GetBook);
-            books.MapPost("/", CreateBook);
-            books.MapPut("/{id}", UpdateBook);
+            books.MapPost("/", CreateBook).Accepts<BookPostDto>("application/json");
+            books.MapPut("/{id}", UpdateBook).Accepts<BookPutDto>("application/json");
             books.MapDelete("/{id}", DeleteBook);
         }
 
@@ -40,31 +43,50 @@ namespace exercise.webapi.Endpoints
             return TypedResults.Ok(dto);
         }
 
-        private static async Task<IResult> CreateBook(IBookRepository bookRepository, BookPostDto dto)
+        private static async Task<IResult> CreateBook(IBookRepository bookRepository, HttpRequest request)
         {
-            // TODO
-            // todo check if author exists
-            // if not - notfound404
+            var dto = await ValidateFromRequest<BookPostDto>(request);
+            
+            if (dto is null)
+            {
+                return TypedResults.BadRequest();
+            }
 
             var book = BookFactory.BookFromBookPost(dto);
             var created = await bookRepository.CreateBook(book);
+            if (created is null)
+            {
+                return TypedResults.NotFound();
+            }
 
             return TypedResults.Ok(created);
         }
 
-        private static async Task<IResult> UpdateBook(IBookRepository bookRepository, int id, BookPutDto dto)
+        private static async Task<IResult> UpdateBook(IBookRepository bookRepository, int id, HttpRequest request)
         {
+            var dto = await ValidateFromRequest<BookPutDto>(request);
+            if (dto is null)
+            {
+                return TypedResults.BadRequest();
+            }
+
             var book = await bookRepository.GetBook(id);
             if (book is null)
             {
                 return TypedResults.NotFound();
             }
 
-            // TODO
-            // check if author is valid
-            // else not found
+            book.AuthorId = dto.AuthorId;
 
-            var outDto = BookFactory.BookDtoFromBook(book);
+            var updated = await bookRepository.UpdateBook(book);
+            if (updated is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+
+            var outDto = BookFactory.BookDtoFromBook(updated);
+
             return TypedResults.Ok(outDto);
         }
 
@@ -79,6 +101,21 @@ namespace exercise.webapi.Endpoints
 
             var dto = BookFactory.BookDtoFromBook(deleted);
             return TypedResults.Ok(dto);
+        }
+
+        private async static Task<T> ValidateFromRequest<T>(HttpRequest request)
+        {
+            T? entity;
+            try
+            {
+                entity = await request.ReadFromJsonAsync<T>();
+            }
+            catch (JsonException ex)
+            {
+                return default;
+            }
+
+            return entity;
         }
     }
 }

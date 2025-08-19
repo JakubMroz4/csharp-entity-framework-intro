@@ -16,8 +16,15 @@ namespace exercise.webapi.Repository
 
         public async Task<Book?> CreateBook(Book book)
         {
+            var authorExists = await _db.Authors.AnyAsync(a => a.Id == book.AuthorId);
+            if (!authorExists)
+            {
+                return null;
+            }
+
             await _db.Books.AddAsync(book);
             await _db.SaveChangesAsync();
+
             return book;
         }
 
@@ -47,12 +54,18 @@ namespace exercise.webapi.Repository
             return await _db.Books.Where(b => b.Id == id).Include(b => b.Author).FirstOrDefaultAsync();
         }
 
-        public async Task<Book?> UpdateBook(int id, Book book)
+        public async Task<Book?> UpdateBook(Book book)
         {
+            var authorExists = await _db.Authors.AnyAsync(a => a.Id == book.AuthorId);
+            if (!authorExists)
+            {
+                return null;
+            }
+
             _db.Books.Update(book);
             await _db.SaveChangesAsync();
 
-            return book;
+            return await _db.Books.Where(b => b.Id == book.Id).Include(b => b.Author).FirstOrDefaultAsync();
         }
     }
 }

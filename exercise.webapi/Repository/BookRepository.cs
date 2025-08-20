@@ -1,5 +1,4 @@
 ﻿using exercise.webapi.Data;
-using exercise.webapi.Exceptions;
 using exercise.webapi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,12 +24,20 @@ namespace exercise.webapi.Repository
             await _db.Books.AddAsync(book);
             await _db.SaveChangesAsync();
 
-            return book;
+            return await _db.Books
+                .Where(b => b.Id == book.Id)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Book?> DeleteBook(int id)
         {
-            var entity = _db.Books.FirstOrDefault(x => x.Id == id);
+            var entity = _db.Books
+                .Where(b => b.Id == id)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefault();
 
             if (entity is null)
             {
@@ -45,13 +52,18 @@ namespace exercise.webapi.Repository
 
         public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            return await _db.Books.Include(b => b.Author).ToListAsync();
+            return await _db.Books.Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .ToListAsync();
 
         }
 
         public async Task<Book?> GetBook(int id)
         {
-            return await _db.Books.Where(b => b.Id == id).Include(b => b.Author).FirstOrDefaultAsync();
+            return await _db.Books.Where(b => b.Id == id)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Book?> UpdateBook(Book book)
@@ -65,7 +77,10 @@ namespace exercise.webapi.Repository
             _db.Books.Update(book);
             await _db.SaveChangesAsync();
 
-            return await _db.Books.Where(b => b.Id == book.Id).Include(b => b.Author).FirstOrDefaultAsync();
+            return await _db.Books.Where(b => b.Id == book.Id)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync();
         }
     }
 }

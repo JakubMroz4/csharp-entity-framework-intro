@@ -20,6 +20,8 @@ namespace exercise.webapi.Factories
                 bookDtos.Add(BookFactory.BookDtoFromBook(book));
             }
 
+            dto.Books = bookDtos;
+
             return dto;
         }
     }

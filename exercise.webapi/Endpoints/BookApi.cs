@@ -59,7 +59,8 @@ namespace exercise.webapi.Endpoints
                 return TypedResults.NotFound();
             }
 
-            return TypedResults.Ok(created);
+            var outDto = BookFactory.BookDtoFromBook(created);
+            return TypedResults.Ok(outDto);
         }
 
         private static async Task<IResult> UpdateBook(IBookRepository bookRepository, int id, HttpRequest request)
@@ -76,7 +77,8 @@ namespace exercise.webapi.Endpoints
                 return TypedResults.NotFound();
             }
 
-            book.AuthorId = dto.AuthorId;
+            if (dto.AuthorId is not null) book.AuthorId = dto.AuthorId.Value;
+            if (dto.PublisherId is not null) book.PublisherId = dto.PublisherId.Value;
 
             var updated = await bookRepository.UpdateBook(book);
             if (updated is null)

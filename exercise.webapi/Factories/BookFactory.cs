@@ -10,6 +10,7 @@ namespace exercise.webapi.Factories
             var book = new Book();
             book.Title = dto.Title;
             book.AuthorId = dto.AuthorId;
+            book.PublisherId = dto.PublisherId;
 
             return book;
         }
@@ -23,6 +24,8 @@ namespace exercise.webapi.Factories
             dto.FirstName = book.Author.FirstName;
             dto.LastName = book.Author.LastName;
             dto.Email = book.Author.Email;
+            dto.PublisherId = book.PublisherId;
+            dto.PublisherName = book.Publisher.Name;
 
             return dto;
         }

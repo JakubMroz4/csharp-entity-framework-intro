@@ -4,28 +4,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace exercise.webapi.Repository
 {
-    public class AuthorRepository : IAuthorRepository
+    public class PublisherRepository : IPublisherRepository
     {
         DataContext _db;
 
-        public AuthorRepository(DataContext db)
+        public PublisherRepository(DataContext db)
         {
             _db = db;
         }
 
-        public async Task<IEnumerable<Author>> GetAllAuthors()
+        public async Task<IEnumerable<Publisher>> GetAllPublishers()
         {
-            return await _db.Authors
-                .Include(a => a.Books)
-                .ThenInclude(b => b.Publisher)
+            return await _db.Publishers
+                .Include(p => p.Books)
+                .ThenInclude(b => b.Author)
                 .ToListAsync();
         }
 
-        public async Task<Author?> GetAuthor(int id)
+        public async Task<Publisher?> GetPublisher(int id)
         {
-            var entity = _db.Authors.Where(a => a.Id == id)
+            var entity = _db.Publishers
+                .Where(p => p.Id == id)
                 .Include(a => a.Books)
-                .ThenInclude(b => b.Publisher)
+                .ThenInclude(b => b.Author)
                 .FirstOrDefaultAsync();
 
             if (entity is null)

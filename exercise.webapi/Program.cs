@@ -30,6 +30,7 @@ builder.Services.AddDbContext<DataContext>(options => {
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 
 var app = builder.Build();
 
@@ -48,5 +49,6 @@ app.UseHttpsRedirection();
 
 app.ConfigureBooksApi();
 app.ConfigureAuthorsApi();
+app.ConfigurePublishersApi();
 
 app.Run();
